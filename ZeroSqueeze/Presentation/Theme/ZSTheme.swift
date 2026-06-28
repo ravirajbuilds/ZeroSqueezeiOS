@@ -164,9 +164,29 @@ private struct SectionLabelModifier: ViewModifier {
     @Environment(\.zsPalette) private var palette
     func body(content: Content) -> some View {
         content
-            .font(.system(size: 11, weight: .semibold, design: .default))
-            .tracking(1.4)
-            .foregroundColor(palette.textTertiary)
+            .font(.system(size: 11, weight: .bold, design: .default))
+            .tracking(1.5)
+            // Was textTertiary — too faint against dark surfaces for a label
+            // that anchors every card. textSecondary lifts the hierarchy.
+            .foregroundColor(palette.textSecondary)
+    }
+}
+
+// ── Chip action ───────────────────────────────────────────────────
+
+/// A small, bordered accent "chip" for inline secondary actions (e.g.
+/// "New Heart Check", "Edit"). Replaces bare accent-coloured text labels so
+/// the affordance reads as a tappable control, not a caption.
+extension View {
+    func zsChip(_ palette: ZSPalette) -> some View {
+        self
+            .font(ZSTypography.chipLabel)
+            .foregroundColor(palette.accent)
+            .padding(.horizontal, ZSSpacing.standard)
+            .padding(.vertical, ZSSpacing.s)
+            .background(palette.accent.opacity(palette.isDark ? 0.14 : 0.10))
+            .clipShape(Capsule())
+            .overlay(Capsule().stroke(palette.accent.opacity(0.4), lineWidth: 0.75))
     }
 }
 
