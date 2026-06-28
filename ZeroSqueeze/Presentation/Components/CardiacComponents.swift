@@ -189,3 +189,58 @@ struct SCGMorphologyView: View {
         .position(x: x, y: h * 0.92)
     }
 }
+
+// ── Score ring ──────────────────────────────────────────────────────
+
+/// Reusable circular score gauge (0–100) with an animated sweep on appear,
+/// matching ReadinessRing's motion. Used for the heart-health score on Today,
+/// the Heart Check result, and the History detail. Replaces three hand-rolled
+/// static rings, and adds the premium fill animation they lacked.
+struct ScoreRing: View {
+    let score: Int
+    var color: Color
+    var label: String? = nil
+    var diameter: CGFloat = 96
+    var lineWidth: CGFloat = 10
+
+    @Environment(\.zsPalette) private var palette
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @State private var animated: CGFloat = 0
+
+    private var fraction: CGFloat { CGFloat(min(max(score, 0), 100)) / 100 }
+
+    var body: some View {
+        ZStack {
+            Circle().stroke(palette.border, lineWidth: lineWidth)
+            Circle()
+                .trim(from: 0, to: animated)
+                .stroke(
+                    AngularGradient(gradient: Gradient(colors: [color.opacity(0.7), color]), center: .center),
+                    style: StrokeStyle(lineWidth: lineWidth, lineCap: .round)
+                )
+                .rotationEffect(.degrees(-90))
+            VStack(spacing: 0) {
+                Text("\(score)")
+                    .font(.system(size: diameter * 0.34, weight: .bold, design: .rounded))
+                    .foregroundColor(palette.textPrimary)
+                if let label {
+                    Text(label.uppercased())
+                        .font(.system(size: max(9, diameter * 0.075), weight: .bold, design: .rounded))
+                        .tracking(1.1)
+                        .foregroundColor(color)
+                }
+            }
+        }
+        .frame(width: diameter, height: diameter)
+        .onAppear {
+            if reduceMotion { animated = fraction }
+            else { withAnimation(.easeOut(duration: 0.9)) { animated = fraction } }
+        }
+        .onChange(of: fraction) { _, new in
+            withAnimation(.easeOut(duration: 0.6)) { animated = new }
+        }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(label ?? "Score")
+        .accessibilityValue("\(score) out of 100")
+    }
+}

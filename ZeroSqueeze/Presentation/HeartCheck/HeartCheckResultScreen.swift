@@ -37,22 +37,10 @@ struct HeartCheckResultScreen: View {
     private var scoreHero: some View {
         VStack(spacing: ZSSpacing.m) {
             Text("HEART HEALTH").sectionLabel()
-            ZStack {
-                Circle().stroke(palette.border, lineWidth: 14)
-                Circle().trim(from: 0, to: CGFloat(measurement.heartHealthScore) / 100)
-                    .stroke(AngularGradient(gradient: Gradient(colors: [scoreColor.opacity(0.7), scoreColor]), center: .center),
-                            style: StrokeStyle(lineWidth: 14, lineCap: .round))
-                    .rotationEffect(.degrees(-90))
-                VStack(spacing: 0) {
-                    Text("\(measurement.heartHealthScore)")
-                        .font(.system(size: 60, weight: .bold, design: .rounded))
-                        .foregroundColor(palette.textPrimary)
-                    Text(HeartHealthModel.band(for: measurement.heartHealthScore).uppercased())
-                        .font(.system(size: 11, weight: .semibold, design: .rounded))
-                        .tracking(1.2).foregroundColor(scoreColor)
-                }
-            }
-            .frame(width: 188, height: 188)
+            ScoreRing(score: measurement.heartHealthScore,
+                      color: scoreColor,
+                      label: HeartHealthModel.band(for: measurement.heartHealthScore),
+                      diameter: 188, lineWidth: 14)
             HStack(spacing: ZSSpacing.xs) {
                 Image(systemName: "heart.fill").foregroundColor(palette.heartRateColor)
                 Text("Heart age \(measurement.heartAge)")
