@@ -1,9 +1,9 @@
 #!/usr/bin/env swift
 // ZeroSqueeze logo generator. Draws a 1024×1024 PNG containing:
 //   • Rounded-square deep cool-ink background
-//   • A bold rose→violet gradient "0" ring (Zero / cuffless)
-//   • A bright white ECG / QRS pulse sweeping horizontally through the ring,
-//     separated from it by a dark cut where they cross
+//   • A "seismic ripple": concentric rose→violet wavefront arcs radiating
+//     from an off-centre sensor focus (seismocardiography as a sonar ping)
+//   • A bright white focus core with a gradient halo ring
 // Writes to: ZeroSqueeze/Resources/Assets.xcassets/AppIcon.appiconset/AppIcon.png
 //        and: ZeroSqueeze/Resources/Assets.xcassets/Logo.imageset/Logo{,@2x,@3x}.png
 //
@@ -122,62 +122,58 @@ func render(size: Int, opaque: Bool = false) -> Data? {
     bloom?.draw(fromCenter: NSPoint(x: cx, y: cy), radius: 0,
                 toCenter: NSPoint(x: cx, y: cy), radius: s * 0.52, options: [])
 
-    // ── Mark: a bold "0" ring (Zero / cuffless) with a white ECG pulse cut
-    //    through its middle. No letterform — a cardiac monogram. ──────────
+    // ── Mark: SEISMIC RIPPLE. Concentric wavefront arcs radiate from an
+    //    off-centre focus (the sensor on the chest) — seismocardiography as a
+    //    sonar/seismograph ping. Asymmetric, dynamic; no ring, no ECG line.
     guard let pGrad = NSGradient(colors: [Palette.ringStart, Palette.ringEnd]) else { return nil }
 
-    let R = s * 0.275                 // ring radius
-    let lw = s * 0.125                // ring thickness
-    let ringRect = NSRect(x: cx - R, y: cy - R, width: 2 * R, height: 2 * R)
+    // Focus sits lower-left of centre; wavefronts sweep up and to the right.
+    let focus = CGPoint(x: cx - s * 0.14, y: cy - s * 0.14)
+    let a0: CGFloat = -50 * .pi / 180      // arc start (down-right)
+    let a1: CGFloat = 132 * .pi / 180      // arc end   (up-left)
 
-    // Gradient-filled ring: clip to the stroked-circle outline, draw gradient.
     NSGraphicsContext.current?.saveGraphicsState()
-    let ringGlow = NSShadow()
-    ringGlow.shadowColor = Palette.glow
-    ringGlow.shadowBlurRadius = s * 0.05
-    ringGlow.shadowOffset = .zero
-    ringGlow.set()
-    let circle = CGPath(ellipseIn: ringRect, transform: nil)
-    let ringStroke = circle.copy(strokingWithWidth: lw, lineCap: .round, lineJoin: .round, miterLimit: 10)
-    ctx.cgContext.saveGState()
-    ctx.cgContext.addPath(ringStroke)
-    ctx.cgContext.clip()
-    pGrad.draw(in: ringRect.insetBy(dx: -lw, dy: -lw), angle: -45)
-    ctx.cgContext.restoreGState()
-    NSGraphicsContext.current?.restoreGraphicsState()
+    let markGlow = NSShadow()
+    markGlow.shadowColor = Palette.glow
+    markGlow.shadowBlurRadius = s * 0.05
+    markGlow.shadowOffset = .zero
+    markGlow.set()
 
-    // ECG pulse sweeping horizontally through the ring centre. A dark "cut"
-    // stroke underneath separates the white line from the ring where they
-    // cross; the white QRS spike sits on top with a soft glow.
-    let mid = cy
-    func ecgPath(width strokeW: CGFloat) -> CGPath {
-        let p = CGMutablePath()
-        p.move(to: CGPoint(x: cx - s * 0.40, y: mid))
-        p.addLine(to: CGPoint(x: cx - s * 0.13, y: mid))
-        p.addLine(to: CGPoint(x: cx - s * 0.075, y: mid + s * 0.055))   // small P
-        p.addLine(to: CGPoint(x: cx - s * 0.020, y: mid - s * 0.060))   // Q dip
-        p.addLine(to: CGPoint(x: cx + s * 0.030, y: mid + s * 0.185))   // tall R
-        p.addLine(to: CGPoint(x: cx + s * 0.075, y: mid - s * 0.085))   // S
-        p.addLine(to: CGPoint(x: cx + s * 0.120, y: mid))
-        p.addLine(to: CGPoint(x: cx + s * 0.40, y: mid))
-        return p.copy(strokingWithWidth: strokeW, lineCap: .round, lineJoin: .round, miterLimit: 10)
+    // Four wavefronts: radius up, thickness up, opacity down — a fading ripple.
+    let waves: [(r: CGFloat, w: CGFloat, op: CGFloat)] = [
+        (0.155, 0.050, 1.00),
+        (0.275, 0.060, 0.80),
+        (0.395, 0.070, 0.56),
+        (0.515, 0.078, 0.34),
+    ]
+    for wv in waves {
+        let arc = CGMutablePath()
+        arc.addArc(center: focus, radius: s * wv.r, startAngle: a0, endAngle: a1, clockwise: false)
+        let stroked = arc.copy(strokingWithWidth: s * wv.w, lineCap: .round, lineJoin: .round, miterLimit: 10)
+        ctx.cgContext.saveGState()
+        ctx.cgContext.setAlpha(wv.op)
+        ctx.cgContext.addPath(stroked)
+        ctx.cgContext.clip()
+        pGrad.draw(in: rect, angle: -45)
+        ctx.cgContext.restoreGState()
     }
-    // Dark separation cut.
+    ctx.cgContext.setAlpha(1)
+
+    // Sensor focus: a bright white core with a rose-violet halo ring.
+    let coreR = s * 0.052
+    let halo = CGMutablePath()
+    halo.addEllipse(in: CGRect(x: focus.x - coreR * 1.9, y: focus.y - coreR * 1.9,
+                               width: coreR * 3.8, height: coreR * 3.8))
+    let haloStroke = halo.copy(strokingWithWidth: s * 0.018, lineCap: .round, lineJoin: .round, miterLimit: 10)
     ctx.cgContext.saveGState()
-    ctx.cgContext.addPath(ecgPath(width: s * 0.085))
-    ctx.cgContext.setFillColor(Palette.bgBottom.cgColor)
-    ctx.cgContext.fillPath()
+    ctx.cgContext.addPath(haloStroke)
+    ctx.cgContext.clip()
+    pGrad.draw(in: rect, angle: -45)
     ctx.cgContext.restoreGState()
-    // White pulse line with glow.
-    NSGraphicsContext.current?.saveGraphicsState()
-    let lineGlow = NSShadow()
-    lineGlow.shadowColor = NSColor.white.withAlphaComponent(0.5)
-    lineGlow.shadowBlurRadius = s * 0.02
-    lineGlow.shadowOffset = .zero
-    lineGlow.set()
-    ctx.cgContext.addPath(ecgPath(width: s * 0.045))
+
     ctx.cgContext.setFillColor(Palette.waveform.cgColor)
-    ctx.cgContext.fillPath()
+    ctx.cgContext.fillEllipse(in: CGRect(x: focus.x - coreR, y: focus.y - coreR,
+                                         width: coreR * 2, height: coreR * 2))
     NSGraphicsContext.current?.restoreGraphicsState()
 
     if opaque, let cg = bitmap.cgImage {
