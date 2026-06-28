@@ -122,7 +122,7 @@ func render(size: Int, opaque: Bool = false) -> Data? {
     bloom?.draw(fromCenter: NSPoint(x: cx, y: cy), radius: 0,
                 toCenter: NSPoint(x: cx, y: cy), radius: s * 0.52, options: [])
 
-    // ── Wordmark: a bold "P" (rose→coral) followed by a real red heart.
+    // ── Wordmark: a bold "Z" (rose→coral) followed by a real red heart.
     //    Sized smaller than the canvas for comfortable padding. ──────────
     guard let pGrad = NSGradient(colors: [Palette.ringStart, Palette.ringEnd]) else { return nil }
     // Real heart-red, with a little depth top→bottom.
@@ -139,8 +139,8 @@ func render(size: Int, opaque: Bool = false) -> Data? {
     mglow.shadowOffset = .zero
     mglow.set()
 
-    // "P": clip to the glyph outline, then fill with the brand gradient.
-    if let p = glyphPath("P", pointSize: s * 0.56) {
+    // "Z": clip to the glyph outline, then fill with the brand gradient.
+    if let p = glyphPath("Z", pointSize: s * 0.56) {
         let b = p.boundingBoxOfPath
         var t = CGAffineTransform(translationX: (cx - s * 0.135) - b.midX, y: cy - b.midY)
         if let tp = p.copy(using: &t) {
