@@ -78,17 +78,9 @@ struct TodayScreen: View {
             VStack(alignment: .leading, spacing: ZSSpacing.m) {
                 Text("HEART HEALTH").sectionLabel()
                 HStack(alignment: .center, spacing: ZSSpacing.l) {
-                    ZStack {
-                        Circle().stroke(palette.border, lineWidth: 8)
-                        Circle().trim(from: 0, to: CGFloat(m.heartHealthScore) / 100)
-                            .stroke(heartScoreColor(m.heartHealthScore),
-                                    style: StrokeStyle(lineWidth: 8, lineCap: .round))
-                            .rotationEffect(.degrees(-90))
-                        Text("\(m.heartHealthScore)")
-                            .font(.system(size: 26, weight: .bold, design: .rounded))
-                            .foregroundColor(palette.textPrimary)
-                    }
-                    .frame(width: 76, height: 76)
+                    ScoreRing(score: m.heartHealthScore,
+                              color: heartScoreColor(m.heartHealthScore),
+                              diameter: 76, lineWidth: 8)
                     VStack(alignment: .leading, spacing: 4) {
                         Text(HeartHealthModel.band(for: m.heartHealthScore))
                             .font(ZSTypography.bodyEmphasized)
