@@ -38,6 +38,7 @@ struct HistoryScreen: View {
                         } else {
                             if !hb.isEmpty { hbChartCard }
                             if !scg.isEmpty { hrChartCard }
+                            if heartChecks.count >= 2 { heartHealthChartCard }
                             rhrChartCard
                             listSection
                         }
@@ -342,6 +343,25 @@ struct HistoryScreen: View {
             // Open the ceiling when a reading runs higher than 180 so a real
             // tachycardia spike isn't cropped off the trend. Floor stays at 40.
             .chartYScale(domain: hrDomain)
+        }
+        .padding(ZSSpacing.l)
+        .background(palette.surface)
+        .clipShape(ZSShapes.cardShape)
+        .overlay(ZSShapes.cardShape.stroke(palette.border, lineWidth: 0.5))
+    }
+
+    private var heartHealthChartCard: some View {
+        VStack(alignment: .leading, spacing: ZSSpacing.s) {
+            Text("HEART HEALTH TREND").sectionLabel()
+            Chart(heartChecks.reversed()) { m in
+                LineMark(x: .value("Date", m.timestamp), y: .value("Score", m.heartHealthScore))
+                    .foregroundStyle(palette.bpColor)
+                    .interpolationMethod(.monotone)
+                PointMark(x: .value("Date", m.timestamp), y: .value("Score", m.heartHealthScore))
+                    .foregroundStyle(palette.bpColor)
+            }
+            .frame(height: 160)
+            .chartYScale(domain: 0...100)
         }
         .padding(ZSSpacing.l)
         .background(palette.surface)
