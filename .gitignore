@@ -1,0 +1,8 @@
+.DS_Store
+build/
+DerivedData/
+*.xcodeproj/xcuserdata/
+*.xcworkspace/xcuserdata/
+ZeroSqueeze.xcodeproj/
+.venv/
+__pycache__/

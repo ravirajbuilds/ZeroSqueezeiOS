@@ -1,0 +1,223 @@
+l================================================================
+PULSEPAL — APP STORE CONNECT ANSWERS  (ready to paste)
+================================================================
+Wellness estimator, NOT a medical device. Copy stays on the wellness
+side of the line. Fill the 3 URL/email blanks before submitting.
+
+App:        ZeroSqueeze
+Bundle ID:  com.zerosqueeze.ios
+SKU:        zerosqueeze-ios-001
+Platform:   iOS 17.0+, iPhone only (portrait)
+Brand mark: rose→coral "P" + red heart (gen_logo.swift)
+
+----------------------------------------------------------------
+1. APP NAME (30)
+----------------------------------------------------------------
+ZeroSqueeze — Camera Vitals
+  (display name on device: ZeroSqueeze)
+  fallback if taken: "ZeroSqueeze: Heart & Hb"
+
+----------------------------------------------------------------
+2. SUBTITLE (30)
+----------------------------------------------------------------
+Heart, HRV & hemoglobin
+
+----------------------------------------------------------------
+3. PROMOTIONAL TEXT (170)
+----------------------------------------------------------------
+Feel your heartbeat in numbers. ZeroSqueeze reads your heart rate, HRV,
+breathing and hemoglobin from your phone camera — in seconds, fully
+on-device. A wellness estimate, never a diagnosis.
+
+----------------------------------------------------------------
+4. KEYWORDS (100 char field, comma-separated, NO spaces after commas)
+----------------------------------------------------------------
+RECOMMENDED (paste this — ~90 chars, broad coverage):
+heart rate,hrv,pulse,hemoglobin,anemia,breathing,ppg,vitals,wellness,bpm,oximeter,recovery
+
+OPTIMIZED (no words already in the app name + subtitle, so nothing is
+wasted — App Store indexes name + subtitle + keywords together; ~94 chars):
+pulse,anemia,breathing,respiration,ppg,wellness,bpm,oximeter,recovery,heartbeat,health,scanner
+
+KEYWORD POOL (mix/swap to fit 100 chars; singular, lowercase):
+heart rate, heartbeat, bpm, resting heart rate, pulse, hrv, variability,
+hemoglobin, anemia, iron, blood, oxygen, oximeter, spo2, breathing,
+respiration, ppg, biofeedback, vitals, wellness, recovery, fitness,
+health, tracker, monitor, scanner, stress, calm
+
+KEYWORD RULES / STRATEGY:
+• 100 characters total INCLUDING commas; no spaces after commas (spaces
+  waste characters). Use singular forms — Apple matches plurals.
+• Do NOT repeat words used in the App Name or Subtitle — they're already
+  indexed. (Name has "camera, vitals"; subtitle has "heart, hrv,
+  hemoglobin" — the OPTIMIZED set above skips those on purpose.)
+• Don't keyword-stuff the Description (Apple ignores it for search and it
+  can read as spam). Keywords come from name + subtitle + this field only.
+• Avoid trademarks / competitor names (e.g. other app names) — rejection risk.
+• "anemia/blood/oxygen/spo2/oximeter" pull medical-adjacent searches; keep
+  the listing wellness-framed so the metadata still matches the app.
+
+----------------------------------------------------------------
+5. DESCRIPTION (4000)
+----------------------------------------------------------------
+Your heartbeat, in numbers — using nothing but your phone.
+
+ZeroSqueeze turns your iPhone into a calm, private vitals check. Look into
+the motion sensor, or rest a fingertip on the rear camera and flash, and
+ZeroSqueeze reads the tiny color changes blood makes as it moves through
+you. In seconds you get your heart rate, heart-rate variability,
+breathing rate, and an estimate of your hemoglobin — every number
+explained in plain language, all of it computed on your device.
+
+No wearable. No chest strap. No cuff. No needle. No account. Nothing is
+ever uploaded.
+
+— A 30-SECOND CHECK-IN —
+• Chest scan: hold the phone at eye level for ~30 seconds. ZeroSqueeze
+  estimates heart rate, beat-to-beat variability (HRV) and respiration
+  from the subtle shifts in your skin.
+• Fingertip scan: cover the rear camera and flash for ~20 seconds for an
+  estimate of hemoglobin with a confidence range, plus your pulse.
+
+— NUMBERS THAT MEAN SOMETHING —
+Every reading comes with context: what's typical, where you sit, and what
+it suggests — the way a good coach would tell you, not a wall of stats.
+A live preview and quality meter show you when the signal is strong.
+
+— SEE YOUR TREND —
+One reading is noise; a trend is signal. ZeroSqueeze keeps a private history
+of your heart rate, resting heart rate, HRV and hemoglobin so you can
+watch the direction, not chase a single number.
+
+— MAKE IT YOURS —
+Have a recent lab CBC? Enter your real hemoglobin once and ZeroSqueeze
+anchors future estimates to you, tightening the range.
+
+— PRIVATE BY DESIGN —
+ZeroSqueeze has no servers to talk to — there is no networking code in the
+app. Every pixel is processed locally, no photo or video is ever saved,
+there is no sign-in, and there is no tracking. Your readings live only on
+your phone, protected when it's locked.
+
+— BUILT WITH CARE —
+A warm, modern design with full Dynamic Type and VoiceOver support, light
+and dark themes, and a single daily snapshot of your vitals at a glance.
+
+— PLEASE READ —
+ZeroSqueeze gives a wellness estimate, not a diagnosis, and is not a medical
+device. Results are approximate and affected by lighting, movement,
+finger placement and skin tone. Always confirm a concerning result with a
+clinician and a real blood test.
+
+----------------------------------------------------------------
+6. WHAT'S NEW
+----------------------------------------------------------------
+Version 1.0 — Hello, ZeroSqueeze.
+• Chest scan: heart rate, HRV and breathing in ~30s
+• Fingertip scan: hemoglobin estimate + pulse in ~20s
+• Live camera preview and signal-quality meter
+• Plain-language meaning for every metric
+• Private trends over time
+• Calibrate hemoglobin to your own lab value
+• 100% on-device — nothing is uploaded
+
+----------------------------------------------------------------
+7. CATEGORY
+----------------------------------------------------------------
+Primary:   Health & Fitness
+Secondary: (none)        # avoid "Medical" — invites stricter review
+
+----------------------------------------------------------------
+8. AGE RATING — QUESTIONNAIRE ANSWERS
+----------------------------------------------------------------
+Result: 4+
+• Medical/Treatment Information ............ None
+• Horror/Fear, Violence, Sexual, Profanity . None
+• Unrestricted Web Access .................. No
+• Gambling / Contests ..................... No
+(The app shows wellness estimates with disclaimers; it does not provide
+ medical treatment info or diagnosis.)
+
+----------------------------------------------------------------
+9. APP PRIVACY (Nutrition Label) — ANSWERS
+----------------------------------------------------------------
+Does this app collect data? .............. NO  → "Data Not Collected"
+• No tracking. No third-party SDKs. No analytics. No network calls.
+• Camera used only for on-device processing; frames never stored or sent.
+• Health readings stored on-device only, file-protected.
+PrivacyInfo.xcprivacy: required-reason APIs only —
+  UserDefaults (CA92.1), File timestamp (C617.1), Disk space (E174.1);
+  NSPrivacyTracking = false.
+
+----------------------------------------------------------------
+10. URLs / CONTACT  (FILL THESE IN)
+----------------------------------------------------------------
+Privacy Policy URL: https://___________________/privacy
+Support URL:        https://___________________/support
+Marketing URL:      (optional)
+Support email:      ____________________
+Copyright:          © 2026 ZeroSqueeze
+
+----------------------------------------------------------------
+11. APP REVIEW INFORMATION
+----------------------------------------------------------------
+Sign-in required? .... No
+Demo account ......... Not needed (no login; demo data seeded on first launch)
+Contact .............. <your name / phone / email>
+
+Review notes:
+ZeroSqueeze is a wellness estimator. It uses the motion sensor with on-device
+Vision face detection () and the rear camera + flash (fingertip PPG)
+to estimate heart rate, HRV, respiration and hemoglobin. ALL processing
+is on-device: there is no networking code, no account, and no data leaves
+the device.
+
+ZeroSqueeze does NOT diagnose. Onboarding requires an "I understand this is
+not a medical device" acknowledgement, and every result screen repeats
+that it is a wellness estimate and to confirm concerning results with a
+clinician.
+
+To test (use a physical device — Simulator has no camera):
+launch -> complete onboarding -> Home -> "Chest scan" (front, ~30s) or
+"Fingertip Hb" (rear + flash, ~20s). No login. History/Trends are
+pre-populated with demo data on first launch.
+
+----------------------------------------------------------------
+12. EXPORT COMPLIANCE
+----------------------------------------------------------------
+Uses encryption? .... Only standard OS encryption (file protection).
+Exempt? ............. Yes.
+Add to Info.plist:  ITSAppUsesNonExemptEncryption = NO
+
+----------------------------------------------------------------
+13. SCREENSHOT CAPTIONS  (6.7" + 6.1" required, on real device)
+----------------------------------------------------------------
+1. "Your heartbeat, in numbers."
+2. "Heart rate, HRV & breathing — from your chest."
+3. "Hemoglobin from a fingertip."
+4. "Every number, explained."
+5. "Watch the trend, not one reading."
+6. "Private by design. Nothing leaves your phone."
+
+----------------------------------------------------------------
+14. BUILD / SIGNING NOTES
+----------------------------------------------------------------
+• Bundle ID com.zerosqueeze.ios registered in your developer account
+• Set DEVELOPMENT_TEAM + signing in project.yml / Xcode
+• App icon 1024x1024, opaque RGB, no alpha (gen_logo.swift handles this)
+• UIRequiredDeviceCapabilities = arm64 only (camera caps removed — they
+  aren't supported on visionOS and triggered a validation warning)
+• NSCameraUsageDescription present and accurate
+
+----------------------------------------------------------------
+15. PRE-SUBMIT CHECKLIST
+----------------------------------------------------------------
+[ ] Register App ID com.zerosqueeze.ios + create App Store Connect record
+[ ] Fill Privacy Policy + Support URLs + support email
+[ ] DEVELOPMENT_TEAM + distribution signing set
+[ ] Screenshots captured on real hardware (6.7" + 6.1")
+[ ] ITSAppUsesNonExemptEncryption = NO in Info.plist
+[ ] Archive validates clean (no alpha-icon / visionOS warnings)
+[ ] Wellness/medical wording reviewed by counsel
+[ ] Capture flows tested on a physical device
+================================================================
