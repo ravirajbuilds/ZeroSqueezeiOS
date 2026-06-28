@@ -1,4 +1,9 @@
 #!/usr/bin/env swift
+// NOTE: the SHIPPED app icon + Logo imageset are now an OpenAI (gpt-image-1)
+// generated mark (glowing rose→violet seismic wavefronts on ink). Running this
+// script will OVERWRITE them with the older hand-vector version — don't run it
+// unless you intend to revert. Kept for reference / future vector work.
+//
 // ZeroSqueeze logo generator. Draws a 1024×1024 PNG containing:
 //   • Rounded-square deep cool-ink background
 //   • A "seismic ripple": concentric rose→violet wavefront arcs radiating
