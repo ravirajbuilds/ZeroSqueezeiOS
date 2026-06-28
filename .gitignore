@@ -6,3 +6,5 @@ DerivedData/
 ZeroSqueeze.xcodeproj/
 .venv/
 __pycache__/
+training/.venv/
+training/scg_data/
