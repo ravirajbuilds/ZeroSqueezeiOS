@@ -108,8 +108,7 @@ struct TodayScreen: View {
                     ZSHaptics.tap(.medium); showHeartCheck = true
                 } label: {
                     Label("New Heart Check", systemImage: "heart.text.square")
-                        .font(ZSTypography.chipLabel)
-                        .foregroundColor(palette.accent)
+                        .zsChip(palette)
                 }
             }
             .padding(ZSSpacing.l)
@@ -157,10 +156,11 @@ struct TodayScreen: View {
 
     private var header: some View {
         HStack(spacing: ZSSpacing.standard) {
-            VStack(alignment: .leading, spacing: 4) {
-                Text(greeting)
-                    .font(ZSTypography.body)
-                    .foregroundColor(palette.textSecondary)
+            VStack(alignment: .leading, spacing: ZSSpacing.xs) {
+                Text(greeting.uppercased())
+                    .font(.system(size: 11, weight: .bold, design: .default))
+                    .tracking(1.5)
+                    .foregroundColor(palette.textTertiary)
                 Text(Date().formatted(.dateTime.weekday(.wide).month().day()))
                     .font(ZSTypography.largeTitle)
                     .foregroundColor(palette.textPrimary)
@@ -202,8 +202,7 @@ struct TodayScreen: View {
                         ZSHaptics.tap(.medium); showChestCapture = true
                     } label: {
                         Label("Chest scan", systemImage: "waveform.path.ecg")
-                            .font(ZSTypography.chipLabel)
-                            .foregroundColor(palette.accent)
+                            .zsChip(palette)
                     }
                     .buttonStyle(.plain)
                     .padding(.top, 2)
@@ -241,9 +240,7 @@ struct TodayScreen: View {
                         }
                     }
                     Spacer()
-                    Text("Edit")
-                        .font(ZSTypography.chipLabel)
-                        .foregroundColor(palette.accent)
+                    Text("Edit").zsChip(palette)
                 } else {
                     Image(systemName: "square.and.pencil")
                         .font(.title3)
