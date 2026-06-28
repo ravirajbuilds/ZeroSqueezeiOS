@@ -104,19 +104,32 @@ HR when bundled, gated by `SCGHeartRateModelRouter`.
 | output `bpm` | Float32 `[1]` |
 | output `confidence` | Float32 `[1]` in [0, 1] |
 
-## Data
+## Data — the shipped model is trained on real CEBS data
 
-Ground-truth pairs come from simultaneous chest-SCG + ECG recordings:
+The bundled `ZSCardiacSCG.mlpackage` is trained on **CEBS** (Combined
+measurement of ECG, Breathing and Seismocardiograms, PhysioNet) — supine
+chest SCG with synchronized ECG. `prep_cebs.py` builds the training set
+end to end:
 
-- **CEBS** (Combined measurement of ECG, Breathing and Seismocardiograms,
-  PhysioNet) — supine SCG with synchronized ECG R-peaks for HR labels.
-- Self-collected phone-on-sternum captures logged via the debug bridge,
-  labelled against a chest-strap HR monitor.
+```bash
+python prep_cebs.py --out ./cebs_data --records 14   # streams via wfdb
+python train_scg.py --data ./cebs_data --epochs 60 --out checkpoints
+```
 
-Window each recording into 6 s segments, resample to 100 Hz, and emit
-`.npz` with `envelope` `[N, 1, 600]` (raw) and `bpm` `[N]`. The AO/AC
-fiducials for LVET labels can be derived from the synchronized echo or
-from the ECG-gated ensemble average.
+Per record it streams the 5 kHz signals, detects R-peaks on ECG lead II
+(decimated to 250 Hz for speed) for ground-truth HR, decimates the SCG
+channel 5 kHz → 100 Hz, slides a 6 s / 600-sample window with 50% overlap,
+and labels each window with the median-RR HR — emitting `.npz` with
+`envelope` `[N, 1, 600]` (raw) and `bpm` `[N]`, one file per subject.
+
+The model that ships was trained on **14 CEBS subjects / 1363 windows**,
+reaching **1.96 bpm MAE** on subject-held-out validation; the converted
+Core ML model tracks real held-out windows to ~1 bpm.
+
+`gen_synth_scg.py` remains as a no-dataset fallback (physiologically-shaped
+synthetic SCG), but real data is preferred and is what's bundled. AO/AC
+fiducials for LVET labels can additionally be derived from the
+ECG-gated ensemble average.
 
 ## Ship into the app
 

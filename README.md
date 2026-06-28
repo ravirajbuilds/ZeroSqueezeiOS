@@ -106,8 +106,11 @@ readiness, resting-HR aggregation, and store persistence/decoding.
 
 ## Roadmap
 
-- Bundle a trained `ZSCardiacSCG.mlpackage` from real chest-SCG recordings
-  (pipeline scaffold in `training/`).
+- ✅ **Done** — `ZSCardiacSCG.mlpackage` is trained on real chest SCG
+  (PhysioNet CEBS, 14 subjects / 1363 windows, 1.96 bpm subject-held-out
+  MAE) and bundled. Pipeline in `training/` (`prep_cebs.py` → `train_scg.py`
+  → `convert_scg_coreml.py`).
+- Expand the SCG training set beyond CEBS (more subjects, free-living, motion).
 - Simultaneous PPG+SCG capture to recover true **pulse transit time** for a
   calibrated (vs indexed) blood-pressure estimate.
 - Per-user BP calibration against a cuff, mirroring the Hb calibration flow.
