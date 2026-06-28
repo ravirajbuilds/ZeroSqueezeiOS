@@ -268,33 +268,73 @@ struct OnboardingScreen: View {
 
 /// Animated concentric pulse rings expanding out from the app logo — the
 /// welcome-screen centrepiece. Honours Reduce Motion (rings hold still).
+/// Onboarding hero: a glowing, gently beating heart with an ECG sweep and
+/// expanding pulse rings — a health-app hero, not the app-icon tile.
 private struct ZSHero: View {
     @Environment(\.zsPalette) private var palette
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
-    @State private var animate = false
+    @State private var rings = false
+    @State private var beat = false
 
     var body: some View {
         ZStack {
+            // Soft radial bloom behind the heart.
+            Circle()
+                .fill(palette.heartRateColor)
+                .frame(width: 150, height: 150)
+                .blur(radius: 70)
+                .opacity(0.45)
+
+            // Expanding pulse rings.
             ForEach(0..<3) { i in
                 Circle()
-                    .stroke(palette.accent.opacity(0.35), lineWidth: 2)
-                    .frame(width: 120, height: 120)
-                    .scaleEffect(animate ? 2.0 : 0.8)
-                    .opacity(animate ? 0 : 0.6)
+                    .stroke(palette.heartRateColor.opacity(0.5), lineWidth: 2.5)
+                    .frame(width: 132, height: 132)
+                    .scaleEffect(rings ? 1.9 : 0.7)
+                    .opacity(rings ? 0 : 0.7)
                     .animation(
                         reduceMotion ? nil :
-                            .easeOut(duration: 2.4).repeatForever(autoreverses: false)
-                            .delay(Double(i) * 0.8),
-                        value: animate
+                            .easeOut(duration: 2.6).repeatForever(autoreverses: false)
+                            .delay(Double(i) * 0.85),
+                        value: rings
                     )
             }
-            ZSLogo(size: 96, cornerRadius: 22)
+
+            // Beating heart with the brand gradient.
+            Image(systemName: "heart.fill")
+                .resizable().scaledToFit()
+                .frame(width: 104, height: 104)
+                .foregroundStyle(palette.accentGradient)
+                .shadow(color: palette.heartRateColor.opacity(0.6), radius: 26)
+                .scaleEffect(beat ? 1.06 : 0.97)
+                .overlay(ecgSweep.frame(width: 78).blendMode(.screen))
+                .animation(
+                    reduceMotion ? nil : .easeInOut(duration: 0.62).repeatForever(autoreverses: true),
+                    value: beat
+                )
         }
-        .frame(height: 200)
-        // Under Reduce Motion, leave `animate` false: the rings stay at their
-        // resting scale 0.8 / opacity 0.6 (visible) instead of snapping to the
-        // animation's end state (opacity 0), which would make them disappear.
-        .onAppear { if !reduceMotion { animate = true } }
+        .frame(height: 220)
+        .accessibilityHidden(true)
+        .onAppear {
+            if !reduceMotion { rings = true; beat = true }
+        }
+    }
+
+    /// A small white ECG blip across the heart's centre.
+    private var ecgSweep: some View {
+        GeometryReader { geo in
+            let w = geo.size.width, midY = geo.size.height / 2
+            Path { p in
+                p.move(to: CGPoint(x: 0, y: midY))
+                p.addLine(to: CGPoint(x: w * 0.32, y: midY))
+                p.addLine(to: CGPoint(x: w * 0.42, y: midY - 16))
+                p.addLine(to: CGPoint(x: w * 0.52, y: midY + 20))
+                p.addLine(to: CGPoint(x: w * 0.60, y: midY))
+                p.addLine(to: CGPoint(x: w, y: midY))
+            }
+            .stroke(Color.white.opacity(0.9), style: StrokeStyle(lineWidth: 2.5, lineCap: .round, lineJoin: .round))
+        }
+        .frame(height: 44)
     }
 }
 
