@@ -12,6 +12,13 @@ heart-health picture:
 - **Finger PPG** — cover the rear camera and torch with a fingertip for
   heart rate, perfusion and a hemoglobin estimate.
 
+- **Heart Check (fused, the capstone)** — press the phone to your chest and
+  rest a fingertip on the rear camera at the *same time*. The chest SCG and
+  finger PPG together give **pulse transit time** (SCG AO → finger pulse),
+  which yields a **cuffless blood-pressure** index, a **heart-health score**
+  and an estimated **heart age**. Neither sensor alone gives PTT — the fusion
+  is the point.
+
 There is **no face/rPPG** path — all sensing is contact-based (chest +
 fingertip).
 
@@ -64,6 +71,17 @@ baseline, perfusion index, red/green AC-ratio, a Monk skin-tone correction
 and a personal calibration into an Hb point estimate with a confidence
 band. The learned `CoreMLHeartRateModel` (`ZSHR.mlmodelc`) upgrades HR when
 bundled.
+
+### Fused Heart Check (chest SCG + finger PPG together)
+
+`HeartCheckViewModel` runs `SCGService` and `CameraPPGService` concurrently and
+re-stamps both streams on one monotonic clock (`CACurrentMediaTime`).
+`PulseTransitTime` detects SCG AO peaks and finger-PPG systolic peaks, pairs
+each AO with the next finger pulse, and takes the robust (median) transit time.
+`HeartHealthModel` maps PTT → cuffless systolic/diastolic (BP falls as PTT
+lengthens), then folds HR, HRV, BP and LVET into a 0–100 cardiovascular score
+and a heart-age estimate vs the user's chronological age. All in
+`Data/Fusion/`.
 
 ## Computational biology, briefly
 

@@ -50,3 +50,28 @@ struct SCGCaptureFlow: View {
         }
     }
 }
+
+/// Fused chest-SCG + finger-PPG capture → Heart Check result (PTT, cuffless
+/// BP, heart-health score, heart age).
+struct HeartCheckFlow: View {
+    let profile: UserProfile
+    let onClose: () -> Void
+
+    @StateObject private var viewModel: HeartCheckViewModel
+
+    init(profile: UserProfile, onClose: @escaping () -> Void) {
+        self.profile = profile
+        self.onClose = onClose
+        _viewModel = StateObject(wrappedValue: HeartCheckViewModel(profile: profile))
+    }
+
+    var body: some View {
+        Group {
+            if case .done(let m) = viewModel.phase {
+                HeartCheckResultScreen(measurement: m, onDone: onClose)
+            } else {
+                HeartCheckScreen(viewModel: viewModel)
+            }
+        }
+    }
+}
