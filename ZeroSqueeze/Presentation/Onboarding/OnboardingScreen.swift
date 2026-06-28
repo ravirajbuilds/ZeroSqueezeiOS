@@ -63,7 +63,7 @@ struct OnboardingScreen: View {
                     .font(.system(size: 40, weight: .bold, design: .rounded))
                     .multilineTextAlignment(.center)
                     .foregroundColor(palette.textPrimary)
-                Text("ZeroSqueeze turns your phone's camera into a window on your heart, breath and blood — in seconds, all on-device.")
+                Text("ZeroSqueeze reads your heartbeat's vibrations from your chest and the pulse in your fingertip — heart rate, HRV, ejection time, a blood-pressure index and hemoglobin, in seconds, all on-device.")
                     .font(ZSTypography.body)
                     .multilineTextAlignment(.center)
                     .foregroundColor(palette.textSecondary)
