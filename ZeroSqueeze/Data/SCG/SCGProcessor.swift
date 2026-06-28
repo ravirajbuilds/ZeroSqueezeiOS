@@ -21,6 +21,10 @@ final class SCGProcessor {
     private(set) var quality: Double = 0
     /// Mean AO-complex peak amplitude over the window, in g.
     private(set) var aoAmplitude: Double = 0
+    /// Strictly-increasing count of accepted AO peaks since `reset()`. Unlike
+    /// `ibis.count` (which is trimmed to a rolling window) this only grows, so
+    /// UIs can drive a per-beat animation/haptic off changes to it.
+    private(set) var beatCounter: Int = 0
 
     var heartRateBpm: Int? {
         let valid = ibis.suffix(10).filter { $0 > 0.3 && $0 < 1.7 }
@@ -75,6 +79,7 @@ final class SCGProcessor {
         lastEnvelope = 0
         aoAmplitude = 0
         quality = 0
+        beatCounter = 0
         sampleRate = initialSampleRate
     }
 
@@ -139,6 +144,7 @@ final class SCGProcessor {
             if ibis.count > 20 { ibis.removeFirst(ibis.count - 20) }
         }
         lastPeakT = t
+        beatCounter += 1
         let amp = curr.squareRoot()
         peakAmps.append(amp)
         if peakAmps.count > 20 { peakAmps.removeFirst(peakAmps.count - 20) }

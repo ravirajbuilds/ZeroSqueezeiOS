@@ -103,11 +103,20 @@ struct SCGCaptureScreen: View {
                 .frame(width: size, height: size)
                 .shadow(color: palette.heartRateColor.opacity(0.4), radius: 30)
 
-            Image(systemName: contactStable ? "heart.fill" : "iphone.gen3")
-                .resizable().scaledToFit()
-                .frame(width: size * 0.32, height: size * 0.32)
-                .foregroundColor(contactStable ? palette.heartRateColor : palette.textSecondary)
-                .symbolEffect(.pulse, options: contactStable ? .repeating : .nonRepeating, value: contactStable)
+            if contactStable {
+                BeatPulse(
+                    beat: viewModel.beatCount,
+                    active: true,
+                    size: size * 0.34,
+                    color: palette.heartRateColor
+                )
+            } else {
+                Image(systemName: "iphone.gen3.radiowaves.left.and.right")
+                    .resizable().scaledToFit()
+                    .frame(width: size * 0.32, height: size * 0.32)
+                    .foregroundColor(palette.textSecondary)
+                    .symbolEffect(.pulse, options: .repeating, value: contactStable)
+            }
 
             Circle()
                 .stroke(contactStable ? palette.successGreen : palette.border, lineWidth: 2)

@@ -25,6 +25,9 @@ final class SCGCaptureViewModel: ObservableObject {
     @Published private(set) var liveBpm: Int?
     @Published private(set) var liveQuality: Double = 0
     @Published private(set) var contactStable = false
+    /// Strictly-increasing detected-beat count — drives the live per-beat
+    /// pulse animation + haptic on the capture screen.
+    @Published private(set) var beatCount: Int = 0
     /// Rolling band-limited SCG envelope for the live waveform (newest-last).
     @Published private(set) var waveform: [Double] = []
     private let waveformCapacity = 200
@@ -90,6 +93,16 @@ final class SCGCaptureViewModel: ObservableObject {
         }
         liveBpm = processor.heartRateBpm
         liveQuality = processor.quality
+
+        // Surface each newly-detected AO beat to the UI, and give a light tap
+        // while capturing so the user feels their own heartbeat being read.
+        if processor.beatCounter != beatCount {
+            let isNewBeat = processor.beatCounter > beatCount
+            beatCount = processor.beatCounter
+            if isNewBeat, case .capturing = phase {
+                ZSHaptics.tap(.light)
+            }
+        }
 
         switch phase {
         case .settling:
