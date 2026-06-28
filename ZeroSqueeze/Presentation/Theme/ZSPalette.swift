@@ -1,9 +1,13 @@
 import SwiftUI
 
-/// Theme palette. Dark = cool graphite-blue; Light = cool paper.
-/// Brand = an indigo→cyan accent (#5B6CFF → #38BDF8) on restrained neutral
-/// surfaces, with a rose pulse accent. Designed for contrast: text and accent
-/// both clear WCAG AA on their backgrounds.
+/// Theme palette — ZeroSqueeze identity v2.
+///
+/// Cool **ink** base (deep blue-black, not warm graphite) carrying one
+/// confident signature: a **rose → violet pulse** gradient (#FF3D71 → #A24BFF)
+/// on primary CTAs, rings and hero accents. Secondary metric hues are cool
+/// (cyan, sky, violet) with warm reserved for the pulse/heart and hemoglobin —
+/// so the canvas reads calm and clinical while the heartbeat reads vivid. Text
+/// and accent both clear WCAG AA on their backgrounds.
 struct ZSPalette {
     let isDark: Bool
     let background: Color
@@ -35,34 +39,26 @@ struct ZSPalette {
     let successGreen: Color
     let inactiveGray: Color
 
-    /// Flat, quiet background. Dark = near-black neutral graphite with a
-    /// barely-there lift toward the bottom. Light = clean warm-neutral paper.
-    /// Kept almost flat on purpose — the colour comes from the accent, not
-    /// the canvas.
+    /// Flat, quiet background. Dark = deep cool ink with a barely-there lift.
+    /// Light = clean cool paper. The colour comes from the accent, not canvas.
     var backgroundGradient: LinearGradient {
         LinearGradient(
             colors: isDark
-                ? [
-                    Color(hex: 0x100C0D),
-                    Color(hex: 0x14100F)
-                ]
-                : [
-                    Color(hex: 0xFCF8F7),
-                    Color(hex: 0xF3ECEA)
-                ],
+                ? [Color(hex: 0x0A0E18), Color(hex: 0x0C1322)]
+                : [Color(hex: 0xF6F8FC), Color(hex: 0xEAEEF6)],
             startPoint: .top,
             endPoint: .bottom
         )
     }
 
-    /// Signature brand gradient: rose → coral. Used on primary CTAs, the
-    /// capture progress ring, and hero accents to give the flat neutral UI
-    /// one premium focal sweep.
+    /// Signature brand gradient: rose → violet "pulse". Used on primary CTAs,
+    /// the capture progress ring, and hero accents — the one premium focal
+    /// sweep over the cool neutral UI.
     var accentGradient: LinearGradient {
         LinearGradient(
             colors: isDark
-                ? [Color(hex: 0xFF4D6D), Color(hex: 0xFF8A4D)]
-                : [Color(hex: 0xE11D48), Color(hex: 0xEA580C)],
+                ? [Color(hex: 0xFF3D71), Color(hex: 0xA24BFF)]
+                : [Color(hex: 0xE11D6B), Color(hex: 0x7C3AED)],
             startPoint: .topLeading,
             endPoint: .bottomTrailing
         )
@@ -95,67 +91,65 @@ extension Color {
 }
 
 extension ZSPalette {
-    // ZeroSqueeze brand rose #FF4D6D → coral on warm near-black. One confident
-    // accent; secondary metric hues are muted so the UI reads calm. accent =
-    // bright rose for dark surfaces, accentSoft = deeper rose.
+    // Signature pulse rose #FF3D71 → violet #A24BFF on deep cool ink. One
+    // confident accent; cool secondary hues keep the UI calm and clinical.
     static let dark = ZSPalette(
         isDark: true,
-        background: Color(hex: 0x100C0D),
-        backgroundElevated: Color(hex: 0x1A1416),
-        surface: Color(hex: 0x1C1618),
-        surfaceElevated: Color(hex: 0x261D20),
-        border: Color(hex: 0x342529),
-        divider: Color(hex: 0x231A1C),
-        textPrimary: Color(hex: 0xF4ECEE),
-        textSecondary: Color(hex: 0xB7ABAE),
-        textTertiary: Color(hex: 0x847479),
-        textDisabled: Color(hex: 0x4F4548),
-        accent: Color(hex: 0xFF4D6D),
-        accentSoft: Color(hex: 0xE03457),
-        heartRateColor: Color(hex: 0xFF4D6D),
-        spO2Color: Color(hex: 0x38BDF8),
-        stepsColor: Color(hex: 0x6EE7B7),
+        background: Color(hex: 0x0A0E18),
+        backgroundElevated: Color(hex: 0x111726),
+        surface: Color(hex: 0x141B2B),
+        surfaceElevated: Color(hex: 0x1B2438),
+        border: Color(hex: 0x27324A),
+        divider: Color(hex: 0x1A2236),
+        textPrimary: Color(hex: 0xEAF0FA),
+        textSecondary: Color(hex: 0xA7B2C6),
+        textTertiary: Color(hex: 0x717C90),
+        textDisabled: Color(hex: 0x3E4759),
+        accent: Color(hex: 0xFF3D71),
+        accentSoft: Color(hex: 0xD62E63),
+        heartRateColor: Color(hex: 0xFF3D71),
+        spO2Color: Color(hex: 0x22D3EE),
+        stepsColor: Color(hex: 0x4ADE80),
         sleepColor: Color(hex: 0x818CF8),
-        hemoglobinColor: Color(hex: 0xFF8A4D),
-        hrvColor: Color(hex: 0xC084FC),
+        hemoglobinColor: Color(hex: 0xFF7A4D),
+        hrvColor: Color(hex: 0x22D3EE),
         respColor: Color(hex: 0x38BDF8),
-        piColor: Color(hex: 0x34D399),
-        stressColor: Color(hex: 0xFBBF24),
-        bpColor: Color(hex: 0xF472B6),
-        caloriesColor: Color(hex: 0xFB923C),
+        piColor: Color(hex: 0x2FD27A),
+        stressColor: Color(hex: 0xFFB020),
+        bpColor: Color(hex: 0xA24BFF),
+        caloriesColor: Color(hex: 0xFF8A4D),
         distanceColor: Color(hex: 0x38BDF8),
-        alertRed: Color(hex: 0xFF5A5A),
-        cautionYellow: Color(hex: 0xFBBF24),
-        successGreen: Color(hex: 0x34D399),
-        inactiveGray: Color(hex: 0x4F4548)
+        alertRed: Color(hex: 0xFF5470),
+        cautionYellow: Color(hex: 0xFFB020),
+        successGreen: Color(hex: 0x2FD27A),
+        inactiveGray: Color(hex: 0x3E4759)
     )
 
     static let light = ZSPalette(
         isDark: false,
-        background: Color(hex: 0xFCF8F7),
-        backgroundElevated: Color(hex: 0xF3ECEA),
+        background: Color(hex: 0xF6F8FC),
+        backgroundElevated: Color(hex: 0xEAEEF6),
         surface: Color(hex: 0xFFFFFF),
         surfaceElevated: Color(hex: 0xFFFFFF),
-        border: Color(hex: 0xEEE2E0),
-        divider: Color(hex: 0xF3EAE8),
-        textPrimary: Color(hex: 0x18100F),
-        textSecondary: Color(hex: 0x5C4D4A),
-        // ~4.7:1 on the #FCF8F7 paper — clears WCAG AA for the small
-        // caption/section-label text it's used for.
-        textTertiary: Color(hex: 0x6B5A56),
-        textDisabled: Color(hex: 0xD2C7C4),
-        accent: Color(hex: 0xE11D48),
-        accentSoft: Color(hex: 0xBE123C),
-        heartRateColor: Color(hex: 0xE11D48),
-        spO2Color: Color(hex: 0x0284C7),
+        border: Color(hex: 0xE2E8F2),
+        divider: Color(hex: 0xEEF2F8),
+        textPrimary: Color(hex: 0x0B1220),
+        textSecondary: Color(hex: 0x46506A),
+        // ~4.6:1 on the #F6F8FC paper — clears WCAG AA for small text.
+        textTertiary: Color(hex: 0x5B6678),
+        textDisabled: Color(hex: 0xC5CDDA),
+        accent: Color(hex: 0xE11D6B),
+        accentSoft: Color(hex: 0xBE185D),
+        heartRateColor: Color(hex: 0xE11D6B),
+        spO2Color: Color(hex: 0x0E9AAE),
         stepsColor: Color(hex: 0x059669),
         sleepColor: Color(hex: 0x6D28D9),
         hemoglobinColor: Color(hex: 0xC2410C),
-        hrvColor: Color(hex: 0x7C3AED),
+        hrvColor: Color(hex: 0x0E8FA3),
         respColor: Color(hex: 0x0284C7),
         piColor: Color(hex: 0x0E9F6E),
         stressColor: Color(hex: 0xB45309),
-        bpColor: Color(hex: 0xBE185D),
+        bpColor: Color(hex: 0x7C3AED),
         caloriesColor: Color(hex: 0xC2410C),
         distanceColor: Color(hex: 0x0284C7),
         alertRed: Color(hex: 0xC81E4A),

@@ -73,12 +73,12 @@ func opaquePNG(_ image: CGImage) -> Data? {
 }
 
 struct Palette {
-    static let bgTop      = NSColor(red: 0x1A/255.0, green: 0x14/255.0, blue: 0x16/255.0, alpha: 1)
-    static let bgBottom   = NSColor(red: 0x0C/255.0, green: 0x08/255.0, blue: 0x09/255.0, alpha: 1)
-    static let ringStart  = NSColor(red: 0xFF/255.0, green: 0x4D/255.0, blue: 0x6D/255.0, alpha: 1) // rose
-    static let ringEnd    = NSColor(red: 0xFF/255.0, green: 0x8A/255.0, blue: 0x4D/255.0, alpha: 1) // coral
+    static let bgTop      = NSColor(red: 0x11/255.0, green: 0x17/255.0, blue: 0x26/255.0, alpha: 1)
+    static let bgBottom   = NSColor(red: 0x0A/255.0, green: 0x0E/255.0, blue: 0x18/255.0, alpha: 1)
+    static let ringStart  = NSColor(red: 0xFF/255.0, green: 0x3D/255.0, blue: 0x71/255.0, alpha: 1) // rose
+    static let ringEnd    = NSColor(red: 0xA2/255.0, green: 0x4B/255.0, blue: 0xFF/255.0, alpha: 1) // violet
     static let waveform   = NSColor.white
-    static let glow       = NSColor(red: 0xFF/255.0, green: 0x4D/255.0, blue: 0x6D/255.0, alpha: 0.55)
+    static let glow       = NSColor(red: 0xFF/255.0, green: 0x3D/255.0, blue: 0x71/255.0, alpha: 0.55)
 }
 
 /// `opaque` = App Store icon mode: flatten away alpha and fill the full square
@@ -116,8 +116,8 @@ func render(size: Int, opaque: Bool = false) -> Data? {
     let cy = s * 0.5
     // Soft radial bloom behind the mark for depth.
     let bloom = NSGradient(colors: [
-        NSColor(red: 0xFF/255.0, green: 0x4D/255.0, blue: 0x6D/255.0, alpha: 0.26),
-        NSColor(red: 0xFF/255.0, green: 0x4D/255.0, blue: 0x6D/255.0, alpha: 0.0)
+        NSColor(red: 0xFF/255.0, green: 0x3D/255.0, blue: 0x71/255.0, alpha: 0.26),
+        NSColor(red: 0xFF/255.0, green: 0x3D/255.0, blue: 0x71/255.0, alpha: 0.0)
     ])
     bloom?.draw(fromCenter: NSPoint(x: cx, y: cy), radius: 0,
                 toCenter: NSPoint(x: cx, y: cy), radius: s * 0.52, options: [])
