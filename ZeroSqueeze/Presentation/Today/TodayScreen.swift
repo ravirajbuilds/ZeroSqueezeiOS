@@ -7,10 +7,12 @@ struct TodayScreen: View {
     @EnvironmentObject var store: MeasurementStore
     @EnvironmentObject var scgStore: SCGMeasurementStore
     @EnvironmentObject var checkInStore: CheckInStore
+    @EnvironmentObject var heartCheckStore: HeartCheckStore
     @Environment(\.zsPalette) private var palette
 
     @State private var showFingertipCapture = false
     @State private var showChestCapture = false
+    @State private var showHeartCheck = false
     @State private var showBreathing = false
     @State private var showCheckIn = false
 
@@ -30,6 +32,7 @@ struct TodayScreen: View {
                     VStack(alignment: .leading, spacing: ZSSpacing.xl) {
                         header
                         readinessCard
+                        heartHealthCard
                         checkInCard
                         vitalsCard
                         breathingCTA
@@ -53,12 +56,100 @@ struct TodayScreen: View {
             .fullScreenCover(isPresented: $showChestCapture) {
                 NavigationStack { SCGCaptureFlow { showChestCapture = false } }
             }
+            .fullScreenCover(isPresented: $showHeartCheck) {
+                NavigationStack {
+                    HeartCheckFlow(profile: appState.profile ?? .placeholder) { showHeartCheck = false }
+                }
+            }
             .fullScreenCover(isPresented: $showBreathing) {
                 BreathingScreen()
             }
             .sheet(isPresented: $showCheckIn) {
                 CheckInSheet(day: Date(), existing: todayCheckIn) { checkInStore.upsert($0) }
             }
+        }
+    }
+
+    // ── Heart health (fused Heart Check) ──────────────────────────────
+
+    @ViewBuilder
+    private var heartHealthCard: some View {
+        if let m = heartCheckStore.latest {
+            VStack(alignment: .leading, spacing: ZSSpacing.m) {
+                Text("HEART HEALTH").sectionLabel()
+                HStack(alignment: .center, spacing: ZSSpacing.l) {
+                    ZStack {
+                        Circle().stroke(palette.border, lineWidth: 8)
+                        Circle().trim(from: 0, to: CGFloat(m.heartHealthScore) / 100)
+                            .stroke(heartScoreColor(m.heartHealthScore),
+                                    style: StrokeStyle(lineWidth: 8, lineCap: .round))
+                            .rotationEffect(.degrees(-90))
+                        Text("\(m.heartHealthScore)")
+                            .font(.system(size: 26, weight: .bold, design: .rounded))
+                            .foregroundColor(palette.textPrimary)
+                    }
+                    .frame(width: 76, height: 76)
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(HeartHealthModel.band(for: m.heartHealthScore))
+                            .font(ZSTypography.bodyEmphasized)
+                            .foregroundColor(palette.textPrimary)
+                        Text("Heart age \(m.heartAge)")
+                            .font(ZSTypography.caption)
+                            .foregroundColor(palette.textSecondary)
+                        if let s = m.systolicMmHg, let d = m.diastolicMmHg {
+                            Text("\(Int(s))/\(Int(d)) mmHg · cuffless")
+                                .font(ZSTypography.captionTight)
+                                .foregroundColor(palette.bpColor)
+                        }
+                    }
+                    Spacer()
+                }
+                Button {
+                    ZSHaptics.tap(.medium); showHeartCheck = true
+                } label: {
+                    Label("New Heart Check", systemImage: "heart.text.square")
+                        .font(ZSTypography.chipLabel)
+                        .foregroundColor(palette.accent)
+                }
+            }
+            .padding(ZSSpacing.l)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(palette.surface)
+            .clipShape(ZSShapes.cardShape)
+            .overlay(ZSShapes.cardShape.stroke(palette.bpColor.opacity(0.35), lineWidth: 0.5))
+        } else {
+            Button {
+                ZSHaptics.tap(.medium); showHeartCheck = true
+            } label: {
+                HStack(spacing: ZSSpacing.m) {
+                    Image(systemName: "heart.text.square.fill")
+                        .font(.title2).foregroundColor(palette.bpColor)
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Take a Heart Check")
+                            .font(ZSTypography.bodyEmphasized).foregroundColor(palette.textPrimary)
+                        Text("Fused SCG + PPG → cuffless BP & heart age")
+                            .font(ZSTypography.caption).foregroundColor(palette.textSecondary)
+                    }
+                    Spacer()
+                    Image(systemName: "chevron.right").font(.caption).foregroundColor(palette.textTertiary)
+                }
+                .padding(ZSSpacing.l)
+                .frame(maxWidth: .infinity)
+                .background(palette.surface)
+                .clipShape(ZSShapes.cardShape)
+                .overlay(ZSShapes.cardShape.stroke(palette.border, lineWidth: 0.5))
+            }
+            .buttonStyle(.plain)
+        }
+    }
+
+    private func heartScoreColor(_ v: Int) -> Color {
+        switch v {
+        case ..<40: return palette.alertRed
+        case ..<55: return palette.cautionYellow
+        case ..<70: return palette.stressColor
+        case ..<85: return palette.successGreen
+        default: return palette.accent
         }
     }
 
