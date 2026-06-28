@@ -1,9 +1,9 @@
 #!/usr/bin/env swift
 // ZeroSqueeze logo generator. Draws a 1024×1024 PNG containing:
-//   • Rounded-square warm near-black background
-//   • A thick rose→coral gradient pulse ring, open at the lower-right where
-//     the waveform exits (gives the mark motion, not a closed loop)
-//   • A bright white ECG / pulse waveform sweeping through the ring
+//   • Rounded-square deep cool-ink background
+//   • A bold rose→violet gradient "0" ring (Zero / cuffless)
+//   • A bright white ECG / QRS pulse sweeping horizontally through the ring,
+//     separated from it by a dark cut where they cross
 // Writes to: ZeroSqueeze/Resources/Assets.xcassets/AppIcon.appiconset/AppIcon.png
 //        and: ZeroSqueeze/Resources/Assets.xcassets/Logo.imageset/Logo{,@2x,@3x}.png
 //
@@ -122,44 +122,62 @@ func render(size: Int, opaque: Bool = false) -> Data? {
     bloom?.draw(fromCenter: NSPoint(x: cx, y: cy), radius: 0,
                 toCenter: NSPoint(x: cx, y: cy), radius: s * 0.52, options: [])
 
-    // ── Wordmark: a bold "Z" (rose→coral) followed by a real red heart.
-    //    Sized smaller than the canvas for comfortable padding. ──────────
+    // ── Mark: a bold "0" ring (Zero / cuffless) with a white ECG pulse cut
+    //    through its middle. No letterform — a cardiac monogram. ──────────
     guard let pGrad = NSGradient(colors: [Palette.ringStart, Palette.ringEnd]) else { return nil }
-    // Real heart-red, with a little depth top→bottom.
-    let heartGrad = NSGradient(colors: [
-        NSColor(red: 0xFF/255.0, green: 0x3B/255.0, blue: 0x5C/255.0, alpha: 1),
-        NSColor(red: 0xC8/255.0, green: 0x10/255.0, blue: 0x32/255.0, alpha: 1)
-    ])!
-    let pGradRect = NSRect(x: cx - s * 0.30, y: cy - s * 0.28, width: s * 0.40, height: s * 0.56)
 
+    let R = s * 0.275                 // ring radius
+    let lw = s * 0.125                // ring thickness
+    let ringRect = NSRect(x: cx - R, y: cy - R, width: 2 * R, height: 2 * R)
+
+    // Gradient-filled ring: clip to the stroked-circle outline, draw gradient.
     NSGraphicsContext.current?.saveGraphicsState()
-    let mglow = NSShadow()
-    mglow.shadowColor = Palette.glow
-    mglow.shadowBlurRadius = s * 0.04
-    mglow.shadowOffset = .zero
-    mglow.set()
-
-    // "Z": clip to the glyph outline, then fill with the brand gradient.
-    if let p = glyphPath("Z", pointSize: s * 0.56) {
-        let b = p.boundingBoxOfPath
-        var t = CGAffineTransform(translationX: (cx - s * 0.135) - b.midX, y: cy - b.midY)
-        if let tp = p.copy(using: &t) {
-            ctx.cgContext.saveGState()
-            ctx.cgContext.addPath(tp)
-            ctx.cgContext.clip()
-            pGrad.draw(in: pGradRect, angle: -45)
-            ctx.cgContext.restoreGState()
-        }
-    }
-
-    // Real red heart, just after the P.
-    let heart = heartPath(center: NSPoint(x: cx + s * 0.150, y: cy), size: s * 0.30)
+    let ringGlow = NSShadow()
+    ringGlow.shadowColor = Palette.glow
+    ringGlow.shadowBlurRadius = s * 0.05
+    ringGlow.shadowOffset = .zero
+    ringGlow.set()
+    let circle = CGPath(ellipseIn: ringRect, transform: nil)
+    let ringStroke = circle.copy(strokingWithWidth: lw, lineCap: .round, lineJoin: .round, miterLimit: 10)
     ctx.cgContext.saveGState()
-    ctx.cgContext.addPath(heart.cgPath)
+    ctx.cgContext.addPath(ringStroke)
     ctx.cgContext.clip()
-    heartGrad.draw(in: heart.bounds, angle: -90)
+    pGrad.draw(in: ringRect.insetBy(dx: -lw, dy: -lw), angle: -45)
     ctx.cgContext.restoreGState()
+    NSGraphicsContext.current?.restoreGraphicsState()
 
+    // ECG pulse sweeping horizontally through the ring centre. A dark "cut"
+    // stroke underneath separates the white line from the ring where they
+    // cross; the white QRS spike sits on top with a soft glow.
+    let mid = cy
+    func ecgPath(width strokeW: CGFloat) -> CGPath {
+        let p = CGMutablePath()
+        p.move(to: CGPoint(x: cx - s * 0.40, y: mid))
+        p.addLine(to: CGPoint(x: cx - s * 0.13, y: mid))
+        p.addLine(to: CGPoint(x: cx - s * 0.075, y: mid + s * 0.055))   // small P
+        p.addLine(to: CGPoint(x: cx - s * 0.020, y: mid - s * 0.060))   // Q dip
+        p.addLine(to: CGPoint(x: cx + s * 0.030, y: mid + s * 0.185))   // tall R
+        p.addLine(to: CGPoint(x: cx + s * 0.075, y: mid - s * 0.085))   // S
+        p.addLine(to: CGPoint(x: cx + s * 0.120, y: mid))
+        p.addLine(to: CGPoint(x: cx + s * 0.40, y: mid))
+        return p.copy(strokingWithWidth: strokeW, lineCap: .round, lineJoin: .round, miterLimit: 10)
+    }
+    // Dark separation cut.
+    ctx.cgContext.saveGState()
+    ctx.cgContext.addPath(ecgPath(width: s * 0.085))
+    ctx.cgContext.setFillColor(Palette.bgBottom.cgColor)
+    ctx.cgContext.fillPath()
+    ctx.cgContext.restoreGState()
+    // White pulse line with glow.
+    NSGraphicsContext.current?.saveGraphicsState()
+    let lineGlow = NSShadow()
+    lineGlow.shadowColor = NSColor.white.withAlphaComponent(0.5)
+    lineGlow.shadowBlurRadius = s * 0.02
+    lineGlow.shadowOffset = .zero
+    lineGlow.set()
+    ctx.cgContext.addPath(ecgPath(width: s * 0.045))
+    ctx.cgContext.setFillColor(Palette.waveform.cgColor)
+    ctx.cgContext.fillPath()
     NSGraphicsContext.current?.restoreGraphicsState()
 
     if opaque, let cg = bitmap.cgImage {
