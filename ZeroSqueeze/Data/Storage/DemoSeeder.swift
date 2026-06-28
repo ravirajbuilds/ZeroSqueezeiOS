@@ -18,6 +18,7 @@ enum DemoSeeder {
         hbStore: MeasurementStore = .shared,
         scgStore: SCGMeasurementStore = .shared,
         checkInStore: CheckInStore = .shared,
+        heartCheckStore: HeartCheckStore = .shared,
         profile: UserProfile = .placeholder,
         defaults: UserDefaults = .standard
     ) {
@@ -37,6 +38,9 @@ enum DemoSeeder {
         }
         for m in syntheticSCG().reversed() {
             scgStore.append(m)
+        }
+        for m in syntheticHeartChecks(profile: profile).reversed() {
+            heartCheckStore.append(m)
         }
         // A handful of journal entries so the Insights journal isn't empty on
         // a fresh install. `upsert` keys by day, so order doesn't matter.
@@ -145,6 +149,35 @@ enum DemoSeeder {
                 estSystolicMmHg: bp?.systolicMmHg,
                 estDiastolicMmHg: bp?.diastolicMmHg,
                 signalQuality: quality
+            )
+        }
+    }
+
+    // ── Heart Check (fused) history ──────────────────────────────────
+
+    /// A few fused Heart Checks across the fortnight, with a mild improving
+    /// trend. Deterministic so screenshots reproduce.
+    private static func syntheticHeartChecks(profile: UserProfile) -> [HeartCheckMeasurement] {
+        var seed = SeededRng(seed: 7)
+        let dayOffsets: [Int] = [0, 4, 9]
+        return dayOffsets.map { daysAgo in
+            let hr = 60 + Int(seed.next() * 14)
+            let hrv = 40.0 + seed.next() * 30.0
+            let ptt = 215.0 + seed.next() * 60.0
+            let bp = HeartHealthModel.bloodPressure(pttMs: ptt)
+            let lvet = BloodPressureEstimator.expectedLVET(hrBpm: Double(hr)) + (seed.next() * 20 - 10)
+            let hh = HeartHealthModel.evaluate(
+                age: profile.age, restingHR: hr, hrvSdnnMs: hrv,
+                systolicMmHg: bp.systolic, lvetMs: lvet, respirationBpm: 14
+            )
+            let hour = 8 + Int(seed.next() * 9)
+            return HeartCheckMeasurement(
+                id: UUID(),
+                timestamp: date(daysAgo: daysAgo, hour: hour, minute: Int(seed.next() * 60)),
+                heartRateBpm: hr, hrvSdnnMs: hrv, pttMs: ptt,
+                systolicMmHg: bp.systolic, diastolicMmHg: bp.diastolic, lvetMs: lvet,
+                heartHealthScore: hh.score, heartAge: hh.heartAge,
+                signalQuality: 0.6 + Float(seed.next()) * 0.3
             )
         }
     }
