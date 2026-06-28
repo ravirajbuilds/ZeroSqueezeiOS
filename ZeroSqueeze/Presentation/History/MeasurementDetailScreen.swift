@@ -222,3 +222,76 @@ private struct DetailScaffold: View {
         }
     }
 }
+
+/// Full breakdown of a single fused Heart Check, with single-record delete.
+struct HeartCheckDetailScreen: View {
+    let measurement: HeartCheckMeasurement
+
+    @EnvironmentObject private var heartCheckStore: HeartCheckStore
+    @Environment(\.zsPalette) private var palette
+    @Environment(\.dismiss) private var dismiss
+    @State private var confirmDelete = false
+
+    var body: some View {
+        DetailScaffold(
+            hero: AnyView(hero),
+            extra: hasBP ? AnyView(bpCard) : nil,
+            rows: [
+                DetailRow(label: "Heart rate",
+                          value: measurement.heartRateBpm.map { "\($0) bpm" } ?? "—",
+                          reading: measurement.heartRateBpm.map { MetricInterpretation.heartRate($0) }),
+                DetailRow(label: "HRV (SDNN)",
+                          value: measurement.hrvSdnnMs.map { String(format: "%.0f ms", $0) } ?? "—",
+                          reading: measurement.hrvSdnnMs.map { MetricInterpretation.hrv($0) }),
+                DetailRow(label: "Pulse transit time",
+                          value: measurement.pttMs.map { String(format: "%.0f ms", $0) } ?? "—"),
+                DetailRow(label: "Ejection time (LVET)",
+                          value: measurement.lvetMs.map { String(format: "%.0f ms", $0) } ?? "—"),
+                DetailRow(label: "Signal quality", value: String(format: "%.0f %%", measurement.signalQuality * 100)),
+                DetailRow(label: "Taken", value: measurement.timestamp.formatted(date: .abbreviated, time: .shortened)),
+            ],
+            onDelete: { confirmDelete = true }
+        )
+        .navigationTitle("Heart Check")
+        .navigationBarTitleDisplayMode(.inline)
+        .confirmationDialog("Delete this reading?", isPresented: $confirmDelete, titleVisibility: .visible) {
+            Button("Delete", role: .destructive) {
+                heartCheckStore.remove(id: measurement.id)
+                ZSHaptics.warning()
+                dismiss()
+            }
+        }
+    }
+
+    private var hero: some View {
+        VStack(spacing: ZSSpacing.s) {
+            Text("HEART HEALTH").sectionLabel()
+            Text("\(measurement.heartHealthScore)")
+                .font(ZSTypography.hero)
+                .foregroundColor(palette.bpColor)
+                .heroNeonShadow(palette.bpColor)
+            Text("Heart age \(measurement.heartAge) · \(HeartHealthModel.band(for: measurement.heartHealthScore))")
+                .font(ZSTypography.caption)
+                .foregroundColor(palette.textSecondary)
+        }
+    }
+
+    private var hasBP: Bool { measurement.systolicMmHg != nil && measurement.diastolicMmHg != nil }
+
+    private var bpCard: some View {
+        VStack(alignment: .leading, spacing: ZSSpacing.m) {
+            Text("CUFFLESS BLOOD PRESSURE").sectionLabel()
+            HStack(alignment: .firstTextBaseline, spacing: 4) {
+                Text("\(Int(measurement.systolicMmHg ?? 0))/\(Int(measurement.diastolicMmHg ?? 0))")
+                    .font(ZSTypography.metricValue).foregroundColor(palette.bpColor)
+                Text("mmHg").font(ZSTypography.caption).foregroundColor(palette.textSecondary)
+            }
+            BPGauge(systolic: measurement.systolicMmHg ?? 0, diastolic: measurement.diastolicMmHg ?? 0)
+        }
+        .padding(ZSSpacing.l)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(palette.surface)
+        .clipShape(ZSShapes.cardShape)
+        .overlay(ZSShapes.cardShape.stroke(palette.bpColor.opacity(0.4), lineWidth: 0.5))
+    }
+}

@@ -7,6 +7,7 @@ struct ZeroSqueezeApp: App {
     @StateObject private var scgStore = SCGMeasurementStore.shared
     @StateObject private var calibrationStore = CalibrationStore.shared
     @StateObject private var checkInStore = CheckInStore.shared
+    @StateObject private var heartCheckStore = HeartCheckStore.shared
 
     var body: some Scene {
         WindowGroup {
@@ -16,6 +17,7 @@ struct ZeroSqueezeApp: App {
                 .environmentObject(scgStore)
                 .environmentObject(calibrationStore)
                 .environmentObject(checkInStore)
+                .environmentObject(heartCheckStore)
                 .zsTheme()
                 .preferredColorScheme(.dark)
                 // Cap only the upper bound at `.accessibility2` — the dark

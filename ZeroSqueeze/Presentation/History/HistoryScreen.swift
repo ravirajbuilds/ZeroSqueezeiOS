@@ -6,30 +6,34 @@ struct HistoryScreen: View {
     @EnvironmentObject var store: MeasurementStore
     @EnvironmentObject var scgStore: SCGMeasurementStore
     @EnvironmentObject var checkInStore: CheckInStore
+    @EnvironmentObject var heartCheckStore: HeartCheckStore
     @Environment(\.zsPalette) private var palette
 
     @State private var range: TimeRange = .month
     @State private var editCheckIn: CheckIn?
 
-    /// Hb / scg measurements within the selected range.
+    /// Hb / scg / heart-check measurements within the selected range.
     private var hb: [HbMeasurement] {
         range.filter(store.measurements, now: Date(), timestamp: \.timestamp)
     }
     private var scg: [SCGMeasurement] {
         range.filter(scgStore.measurements, now: Date(), timestamp: \.timestamp)
     }
+    private var heartChecks: [HeartCheckMeasurement] {
+        range.filter(heartCheckStore.measurements, now: Date(), timestamp: \.timestamp)
+    }
 
     var body: some View {
         ZStack {
             palette.backgroundGradient.ignoresSafeArea()
-            if store.measurements.isEmpty && scgStore.measurements.isEmpty && checkInStore.entries.isEmpty {
+            if store.measurements.isEmpty && scgStore.measurements.isEmpty && heartCheckStore.measurements.isEmpty && checkInStore.entries.isEmpty {
                 emptyState
             } else {
                 ScrollView {
                     VStack(alignment: .leading, spacing: ZSSpacing.xl) {
                         rangePicker
                         if !store.measurements.isEmpty { weeklySummaryCard }
-                        if hb.isEmpty && scg.isEmpty {
+                        if hb.isEmpty && scg.isEmpty && heartChecks.isEmpty {
                             rangeEmptyState
                         } else {
                             if !hb.isEmpty { hbChartCard }
@@ -387,17 +391,20 @@ struct HistoryScreen: View {
     private enum Row: Identifiable {
         case hb(HbMeasurement)
         case scg(SCGMeasurement)
+        case heartCheck(HeartCheckMeasurement)
 
         var id: String {
             switch self {
             case .hb(let m): return "hb-\(m.id.uuidString)"
             case .scg(let m): return "scg-\(m.id.uuidString)"
+            case .heartCheck(let m): return "hc-\(m.id.uuidString)"
             }
         }
         var timestamp: Date {
             switch self {
             case .hb(let m): return m.timestamp
             case .scg(let m): return m.timestamp
+            case .heartCheck(let m): return m.timestamp
             }
         }
     }
@@ -405,7 +412,8 @@ struct HistoryScreen: View {
     private var listSection: some View {
         let rows: [Row] = (
             hb.map { Row.hb($0) } +
-            scg.map { Row.scg($0) }
+            scg.map { Row.scg($0) } +
+            heartChecks.map { Row.heartCheck($0) }
         ).sorted { $0.timestamp > $1.timestamp }
 
         return VStack(alignment: .leading, spacing: ZSSpacing.m) {
@@ -416,6 +424,7 @@ struct HistoryScreen: View {
                         switch row {
                         case .hb(let m): HbDetailScreen(measurement: m)
                         case .scg(let m): SCGDetailScreen(measurement: m)
+                        case .heartCheck(let m): HeartCheckDetailScreen(measurement: m)
                         }
                     } label: {
                         rowView(row)
@@ -436,6 +445,8 @@ struct HistoryScreen: View {
             case .scg(let m):
                 let v = m.heartRateBpm.map { "\($0) bpm" } ?? "—"
                 return ("waveform.path.ecg", v, palette.heartRateColor)
+            case .heartCheck(let m):
+                return ("heart.text.square.fill", "\(m.heartHealthScore)", palette.bpColor)
             }
         }()
         return HStack(spacing: ZSSpacing.standard) {
@@ -470,6 +481,11 @@ struct HistoryScreen: View {
         case .scg(let m):
             if let hrv = m.hrvSdnnMs { return "HRV \(Int(hrv)) ms" }
             return "Chest scan"
+        case .heartCheck(let m):
+            if let s = m.systolicMmHg, let d = m.diastolicMmHg {
+                return "Heart Check · \(Int(s))/\(Int(d)) mmHg"
+            }
+            return "Heart Check · age \(m.heartAge)"
         }
     }
 }
