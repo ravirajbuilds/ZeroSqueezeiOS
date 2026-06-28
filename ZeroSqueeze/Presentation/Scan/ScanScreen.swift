@@ -9,6 +9,7 @@ struct ScanScreen: View {
 
     @State private var showFingertipCapture = false
     @State private var showChestCapture = false
+    @State private var showHeartCheck = false
     @State private var showBreathing = false
 
     var body: some View {
@@ -16,6 +17,13 @@ struct ScanScreen: View {
             palette.backgroundGradient.ignoresSafeArea()
             ScrollView {
                 VStack(spacing: ZSSpacing.l) {
+                    card(
+                        title: "Heart Check (SCG + PPG)",
+                        subtitle: "The full picture: press the phone to your chest and a fingertip on the rear camera. Fuses both pulses for cuffless blood pressure, a heart-health score & heart age. ~30 seconds.",
+                        icon: "heart.text.square.fill",
+                        accent: palette.bpColor
+                    ) { ZSHaptics.tap(.medium); showHeartCheck = true }
+
                     card(
                         title: "Chest scan (SCG)",
                         subtitle: "Lie back, rest the phone on your breastbone. Heart rate, HRV, ejection time & a blood-pressure index from cardiac vibrations. ~25 seconds.",
@@ -52,6 +60,11 @@ struct ScanScreen: View {
         }
         .fullScreenCover(isPresented: $showChestCapture) {
             NavigationStack { SCGCaptureFlow { showChestCapture = false } }
+        }
+        .fullScreenCover(isPresented: $showHeartCheck) {
+            NavigationStack {
+                HeartCheckFlow(profile: appState.profile ?? .placeholder) { showHeartCheck = false }
+            }
         }
         .fullScreenCover(isPresented: $showBreathing) {
             BreathingScreen()
