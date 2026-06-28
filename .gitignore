@@ -8,8 +8,5 @@ ZeroSqueeze.xcodeproj/
 __pycache__/
 training/.venv/
 training/scg_data/
-<<<<<<< Updated upstream
-=======
 training/cebs_data/
 training/.venv312/
->>>>>>> Stashed changes

@@ -13,6 +13,7 @@ struct SCGResultScreen: View {
                 VStack(spacing: ZSSpacing.xl) {
                     heroBlock
                     if hasBP { bloodPressureBlock }
+                    if measurement.lvetMs != nil { morphologyBlock }
                     detailsBlock
                     disclaimerBlock
                     Button("Done", action: onDone)
@@ -93,6 +94,11 @@ struct SCGResultScreen: View {
             ))
             .font(ZSTypography.caption)
             .foregroundColor(palette.textSecondary)
+            BPGauge(
+                systolic: measurement.estSystolicMmHg ?? 0,
+                diastolic: measurement.estDiastolicMmHg ?? 0
+            )
+            .padding(.top, ZSSpacing.xs)
             Text("Modelled from your ejection time and heart rate — an index, not a cuff reading.")
                 .font(ZSTypography.captionTight)
                 .foregroundColor(palette.textTertiary)
@@ -106,6 +112,48 @@ struct SCGResultScreen: View {
         .overlay(ZSShapes.cardShape.stroke(palette.bpColor.opacity(0.4), lineWidth: 0.5))
     }
 
+    private var morphologyBlock: some View {
+        VStack(alignment: .leading, spacing: ZSSpacing.m) {
+            Text("CARDIAC TIMING")
+                .sectionLabel()
+            SCGMorphologyView(lvetMs: measurement.lvetMs, color: palette.heartRateColor)
+            HStack(spacing: ZSSpacing.l) {
+                timingChip(
+                    title: "Ejection (LVET)",
+                    value: measurement.lvetMs.map { String(format: "%.0f ms", $0) } ?? "—"
+                )
+                timingChip(
+                    title: "Contraction",
+                    value: measurement.aoAmplitudeMg.map { String(format: "%.0f mg", $0) } ?? "—"
+                )
+            }
+            Text("AO marks the heart's systolic kick; AC marks aortic-valve closing. The span between them is your ejection time.")
+                .font(ZSTypography.captionTight)
+                .foregroundColor(palette.textTertiary)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .padding(ZSSpacing.l)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(palette.surface)
+        .clipShape(ZSShapes.cardShape)
+        .overlay(ZSShapes.cardShape.stroke(palette.border, lineWidth: 0.5))
+    }
+
+    private func timingChip(title: String, value: String) -> some View {
+        VStack(alignment: .leading, spacing: 2) {
+            Text(title.uppercased())
+                .font(ZSTypography.metricLabel)
+                .foregroundColor(palette.textTertiary)
+            Text(value)
+                .font(ZSTypography.metricValueSmall)
+                .foregroundColor(palette.textPrimary)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(ZSSpacing.m)
+        .background(palette.heartRateColor.opacity(0.10))
+        .clipShape(ZSShapes.smallShape)
+    }
+
     private var detailsBlock: some View {
         VStack(spacing: ZSSpacing.standard) {
             MetricRow(
@@ -117,14 +165,6 @@ struct SCGResultScreen: View {
                 label: "Respiration",
                 value: measurement.respirationBpm.map { String(format: "%.0f /min", $0) } ?? "—",
                 reading: measurement.respirationBpm.map { MetricInterpretation.respiration($0) }
-            )
-            MetricRow(
-                label: "Ejection time (LVET)",
-                value: measurement.lvetMs.map { String(format: "%.0f ms", $0) } ?? "—"
-            )
-            MetricRow(
-                label: "Contraction strength",
-                value: measurement.aoAmplitudeMg.map { String(format: "%.0f mg", $0) } ?? "—"
             )
             MetricRow(label: "Signal quality", value: String(format: "%.0f %%", measurement.signalQuality * 100))
             if let src = measurement.modelSource {

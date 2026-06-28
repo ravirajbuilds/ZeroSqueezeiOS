@@ -68,6 +68,7 @@ struct SCGDetailScreen: View {
     var body: some View {
         DetailScaffold(
             hero: AnyView(hero),
+            extra: hasExtra ? AnyView(extraCards) : nil,
             rows: [
                 DetailRow(label: "HRV (SDNN)",
                           value: measurement.hrvSdnnMs.map { String(format: "%.0f ms", $0) } ?? "—",
@@ -108,6 +109,62 @@ struct SCGDetailScreen: View {
             .minimumScaleFactor(0.6)
         }
     }
+
+    private var hasExtra: Bool {
+        measurement.estSystolicMmHg != nil || measurement.lvetMs != nil
+    }
+
+    private func card<Content: View>(@ViewBuilder _ content: () -> Content) -> some View {
+        VStack(alignment: .leading, spacing: ZSSpacing.m, content: content)
+            .padding(ZSSpacing.l)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(palette.surface)
+            .clipShape(ZSShapes.cardShape)
+            .overlay(ZSShapes.cardShape.stroke(palette.border, lineWidth: 0.5))
+    }
+
+    @ViewBuilder
+    private var extraCards: some View {
+        VStack(spacing: ZSSpacing.l) {
+            if let sys = measurement.estSystolicMmHg, let dia = measurement.estDiastolicMmHg {
+                card {
+                    Text("ESTIMATED BLOOD PRESSURE").sectionLabel()
+                    HStack(alignment: .firstTextBaseline, spacing: 4) {
+                        Text("\(Int(sys))/\(Int(dia))")
+                            .font(ZSTypography.metricValue)
+                            .foregroundColor(palette.bpColor)
+                        Text("mmHg")
+                            .font(ZSTypography.caption)
+                            .foregroundColor(palette.textSecondary)
+                    }
+                    Text(BloodPressureEstimator.category(systolic: sys, diastolic: dia))
+                        .font(ZSTypography.caption)
+                        .foregroundColor(palette.textSecondary)
+                    BPGauge(systolic: sys, diastolic: dia)
+                }
+            }
+            if measurement.lvetMs != nil {
+                card {
+                    Text("CARDIAC TIMING").sectionLabel()
+                    SCGMorphologyView(lvetMs: measurement.lvetMs, color: palette.heartRateColor)
+                    HStack(spacing: ZSSpacing.l) {
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("EJECTION (LVET)").font(ZSTypography.metricLabel).foregroundColor(palette.textTertiary)
+                            Text(measurement.lvetMs.map { String(format: "%.0f ms", $0) } ?? "—")
+                                .font(ZSTypography.metricValueSmall).foregroundColor(palette.textPrimary)
+                        }
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("CONTRACTION").font(ZSTypography.metricLabel).foregroundColor(palette.textTertiary)
+                            Text(measurement.aoAmplitudeMg.map { String(format: "%.0f mg", $0) } ?? "—")
+                                .font(ZSTypography.metricValueSmall).foregroundColor(palette.textPrimary)
+                        }
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                    }
+                }
+            }
+        }
+    }
 }
 
 /// One detail row, optionally carrying a plain-language interpretation.
@@ -121,6 +178,7 @@ struct DetailRow: Identifiable {
 /// Shared layout: hero card, a labelled detail grid, and a delete button.
 private struct DetailScaffold: View {
     let hero: AnyView
+    var extra: AnyView? = nil
     let rows: [DetailRow]
     let onDelete: () -> Void
 
@@ -137,6 +195,8 @@ private struct DetailScaffold: View {
                         .background(palette.surface)
                         .clipShape(ZSShapes.cardShape)
                         .overlay(ZSShapes.cardShape.stroke(palette.border, lineWidth: 0.5))
+
+                    if let extra { extra }
 
                     VStack(spacing: ZSSpacing.standard) {
                         ForEach(rows) { row in
