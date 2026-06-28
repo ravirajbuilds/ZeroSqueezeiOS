@@ -25,6 +25,42 @@ final class SCGProcessorTests: XCTestCase {
         return out
     }
 
+    /// Like `synthSCG` but adds an AC (aortic-valve closing) lobe `lvet`
+    /// seconds after each AO complex, so the processor can recover LVET.
+    private func synthSCGWithAC(bpm: Double, lvet: Double, seconds: Double, fs: Double = 100) -> [SCGSample] {
+        let beatPeriod = 60.0 / bpm
+        let n = Int(seconds * fs)
+        var out: [SCGSample] = []
+        for i in 0..<n {
+            let t = Double(i) / fs
+            let phase = t.truncatingRemainder(dividingBy: beatPeriod)
+            var a = 0.0
+            if phase < 0.05 { a += 0.03 * exp(-phase / 0.015) * sin(2 * .pi * 30 * phase) }
+            let ac = phase - lvet
+            if ac >= 0, ac < 0.05 { a += 0.013 * exp(-ac / 0.012) * sin(2 * .pi * 26 * ac) }
+            out.append(SCGSample(t: t, ax: 0, ay: 0, az: a + 1e-4))
+        }
+        return out
+    }
+
+    /// Full chain: AO+AC synthetic beats → SCGProcessor.features() → a complete
+    /// SCGMeasurement-style set with a plausible LVET and a BP index.
+    func testFullChainRecoversLVETAndBloodPressure() {
+        let p = SCGProcessor()
+        for s in synthSCGWithAC(bpm: 66, lvet: 0.30, seconds: 10) { p.ingest(s) }
+        let f = p.features()
+        XCTAssertNotNil(f.heartRateBpm)
+        let lvet = try! XCTUnwrap(f.lvetMs, "LVET should be recovered from AO→AC")
+        XCTAssertEqual(lvet, 300, accuracy: 60)
+        let bp = try! XCTUnwrap(
+            BloodPressureEstimator.estimate(lvetMs: f.lvetMs, hrBpm: f.heartRateBpm,
+                                            signalQuality: f.quality, beatCount: f.ibiCount)
+        )
+        XCTAssertGreaterThanOrEqual(bp.systolicMmHg, 85)
+        XCTAssertLessThanOrEqual(bp.systolicMmHg, 185)
+        XCTAssertGreaterThanOrEqual(bp.systolicMmHg - bp.diastolicMmHg, 25)
+    }
+
     func testDetectsHeartRateFromSyntheticBeats() {
         let p = SCGProcessor()
         for s in synthSCG(bpm: 72, seconds: 8) { p.ingest(s) }
